@@ -1,0 +1,49 @@
+﻿@page "/mebli"
+@using System.Net.Http
+@using System.Net.Http.Json
+@using Blazor.Data;
+@using DataAccess.Models;
+@inject HttpClient Http
+<div class="container-fluid">
+    <h1>Mebli</h1>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Virobnik</th>
+                <th>Material</th>
+                <th>Price</th>
+                <th>Prodavec Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var v in view)
+            {
+                <tr>
+                    <td>@v.Virobnik</td>
+                    <td>@v.Material</td>
+                    <td>@v.Price</td>
+                    <td>@v.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@code {
+    private List<MebliPokaz> view = new List<MebliPokaz>();
+    protected override void OnInitialized()
+    {
+        var meblis = Http.GetFromJsonAsync<List<MebliPokaz>>("https://localhost:44324/api/Mebli/all").Result;
+        var opis = Http.GetFromJsonAsync<List<MebliOpis>>("https://localhost:44324/api/Opis/all").Result;
+        var prodavcis = Http.GetFromJsonAsync<List<Prodavci>>("https://localhost:44324/api/Prodavci/all").Result;
+        foreach (var mebli in meblis)
+        {
+            view.Add(new MebliPokaz
+            {
+                Price = mebli.Price,
+                Virobnik = opis.Where(d => d.MebliID == mebli.Id).First().Virobnik,
+                Material = opis.Where(d => d.MebliID == mebli.Id).First().Material,
+                Email = prodavcis.Where(d => d.Id == mebli.ProdavecID).First().Email
+            });
+        }
+    }
+}

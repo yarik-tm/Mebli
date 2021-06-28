@@ -1,0 +1,35 @@
+﻿@page "/robitniki"
+@using System.Net.Http
+@using System.Net.Http.Json
+@using Blazor.Data;
+@using DataAccess.Models;
+@inject HttpClient Http
+<div class="container-fluid">
+    <h1>Robitniki</h1>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>FullName</th>
+                <th>Staj</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var v in view)
+            {
+                <tr>
+                    <td>@v.Id</td>
+                    <td>@v.FullName</td>
+                    <td>@v.Staj</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@code {
+    List<RobitnikiPokaz> view = new List<RobitnikiPokaz>();
+    protected override void OnInitialized()
+    {
+        view = Http.GetFromJsonAsync<List<RobitnikiPokaz>>("https://localhost:44324/api/Robitniki/all").Result;
+    }
+}
